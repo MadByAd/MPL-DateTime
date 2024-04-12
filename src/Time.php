@@ -299,7 +299,7 @@ class Time
 
 
     /**
-     * This method will return the storedunix data
+     * This method will return the stored unix data
      * 
      * @return int
      */
