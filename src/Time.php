@@ -12,6 +12,14 @@
 
 namespace MadByAd\MPLDateTime;
 
+use MadByAd\MPLDateTime\Exceptions\TimeInvalidNegativeUnixException;
+use MadByAd\MPLDateTime\Exceptions\TimeInvalidNegativeYearException;
+use MadByAd\MPLDateTime\Exceptions\TimeInvalidNegativeMonthException;
+use MadByAd\MPLDateTime\Exceptions\TimeInvalidNegativeDayException;
+use MadByAd\MPLDateTime\Exceptions\TimeInvalidNegativeHourException;
+use MadByAd\MPLDateTime\Exceptions\TimeInvalidNegativeMinuteException;
+use MadByAd\MPLDateTime\Exceptions\TimeInvalidNegativeSecondException;
+
 /**
  * 
  * The Time class is used for storing time and can be used for time or/and date
@@ -26,35 +34,240 @@ namespace MadByAd\MPLDateTime;
 class Time
 {
 
+    /**
+     * Store the list of durations
+     * 
+     * @var array
+     */
+
+    private array $durationInUnix = [
+        "year" => 31_104_000,
+        "month" => 2_592_000,
+        "day" => 86_400,
+        "hour" => 3_600,
+        "minute" => 60,
+        "second" => 1,
+    ];
+
+    /**
+     * Store the time in unix second
+     * 
+     * @var int
+     */
+
     private int $unix = 0;
+
+    /**
+     * Store the year
+     * 
+     * @var int
+     */
 
     private int $year = 0;
     
+    /**
+     * Store the month
+     * 
+     * @var int
+     */
+
     private int $month = 0;
     
-    private int $week = 0;
-    
+    /**
+     * Store the day
+     * 
+     * @var int
+     */
+
     private int $day = 0;
     
+    /**
+     * Store the hour
+     * 
+     * @var int
+     */
+
     private int $hour = 0;
+
+    /**
+     * Store the minute
+     * 
+     * @var int
+     */
 
     private int $minute = 0;
 
+    /**
+     * Store the second
+     * 
+     * @var int
+     */
+
     private int $second = 0;
+
+    /**
+     * Update the unix so other time duration get updated
+     * 
+     * @return void
+     */
+
+    private function updateUnix()
+    {
+
+        if($this->unix <= 0) {
+            $this->unix = 0;
+            $this->year = 0;
+            $this->month = 0;
+            $this->day = 0;
+            $this->hour = 0;
+            $this->minute = 0;
+            $this->second = 0;
+            return;
+        }
+
+        $storeUnix = $this->unix;
+        
+        while($this->unix >= 60) {
+            foreach($this->durationInUnix as $duration => $value) {
+                if($this->unix >= $value) {
+                    $this->unix -= $value;
+                    $this->{$duration} += 1;
+                    break;
+                }
+            }
+        }
+
+        $this->second = $this->unix;
+        $this->unix = $storeUnix;
+
+    }
+
+    /**
+     * Update the time so the unix time also get updated
+     * 
+     * @return void
+     */
 
     private function updateTime()
     {
+        
+        while($this->second >= 60) {
+            $this->second -= 60;
+            $this->minute += 1;
+        }
+
+        while($this->minute >= 60) {
+            $this->minute -= 60;
+            $this->hour += 1;
+        }
+
+        while($this->hour >= 24) {
+            $this->hour -= 24;
+            $this->day += 1;
+        }
+
+        while($this->day >= 30) {
+            $this->day -= 30;
+            $this->month += 1;
+        }
+
+        while($this->month >= 12) {
+            $this->month -= 12;
+            $this->year += 1;
+        }
 
     }
 
-    public function multiply()
+    /**
+     * Multiply the duration by a certain amount
+     * 
+     * @param int $amount The amount to multiply
+     * @return void
+     */
+
+    public function multiply(int $amount)
     {
-        $this->updateTime();
+        $this->unix *= $amount;
+        $this->updateUnix();
     }
 
-    public function divide()
+    /**
+     * Divide the duration by a certain amount
+     * 
+     * @param int $amount The amount to divide
+     * @return void
+     */
+
+    public function divide(int $amount)
     {
-        $this->updateTime();
+        $this->unix = round($this->unix * $amount);
+        $this->updateUnix();
+    }
+
+
+    /**
+     * Get the time as an associative array
+     * 
+     * @return array
+     */
+
+    public function get()
+    {
+        return [
+            "unix" => $this->unix,
+            "year" => $this->year,
+            "month" => $this->month,
+            "day" => $this->day,
+            "hour" => $this->hour,
+            "minute" => $this->minute,
+            "second" => $this->second,
+        ];
+    }
+
+    /**
+     * Get the time as a formatted string
+     * 
+     * @return string
+     */
+
+    public function getString()
+    {
+
+        $format = [];
+
+        if($this->year > 0) {
+            $s = "";
+            if($this->year > 1) $s = "s";
+            $format[] = "{$this->year} year{$s}";
+        }
+        if($this->month > 0) {
+            $s = "";
+            if($this->month > 1) $s = "s";
+            $format[] = "{$this->month} month{$s}";
+        }
+        if($this->day > 0) {
+            $s = "";
+            if($this->day > 1) $s = "s";
+            $format[] = "{$this->day} day{$s}";
+        }
+        if($this->hour > 0) {
+            $s = "";
+            if($this->hour > 1) $s = "s";
+            $format[] = "{$this->hour} hour{$s}";
+        }
+        if($this->minute > 0) {
+            $s = "";
+            if($this->minute > 1) $s = "s";
+            $format[] = "{$this->minute} minute{$s}";
+        }
+        if($this->second > 0) {
+            $s = "";
+            if($this->second > 1) $s = "s";
+            $format[] = "{$this->second} second{$s}";
+        }
+
+        return implode(" ", $format);
+
     }
 
 
@@ -66,7 +279,6 @@ class Time
 
     public function getUnix()
     {
-        $this->updateTime();
         return $this->unix;
     }
 
@@ -75,12 +287,19 @@ class Time
      * 
      * @param int $data The new data
      * @return void
+     * 
+     * @throws TimeInvalidNegativeUnixException if trying to set to a negative value
      */
 
     public function setUnix(int $data)
     {
-        $this->updateTime();
+
+        if($data < 0) {
+            throw new TimeInvalidNegativeUnixException("error cannot set the unix to be negative value ({$data})");
+        }
+
         $this->unix = $data;
+        $this->updateUnix();
     }
 
     /**
@@ -92,8 +311,8 @@ class Time
 
     public function addUnix(int $amount)
     {
-        $this->updateTime();
         $this->unix += $amount;
+        $this->updateUnix();
     }
 
     /**
@@ -105,8 +324,8 @@ class Time
 
     public function subtractUnix(int $amount)
     {
-        $this->updateTime();
         $this->unix -= $amount;
+        $this->updateUnix();
     }
 
 
@@ -118,7 +337,6 @@ class Time
 
     public function getYear()
     {
-        $this->updateTime();
         return $this->year;
     }
 
@@ -127,12 +345,19 @@ class Time
      * 
      * @param int $data The new data
      * @return void
+     * 
+     * @throws TimeInvalidNegativeYearException if trying to set to a negative value
      */
 
     public function setYear(int $data)
     {
-        $this->updateTime();
+
+        if($data < 0) {
+            throw new TimeInvalidNegativeYearException("error cannot set the year to be a negative value ({$data})");
+        }
+
         $this->year = $data;
+        $this->updateTime();
     }
 
     /**
@@ -144,8 +369,8 @@ class Time
 
     public function addYear(int $amount)
     {
-        $this->updateTime();
-        $this->year += $amount;
+        $this->unix += $amount * $this->durationInUnix["year"];
+        $this->updateUnix();
     }
 
     /**
@@ -157,8 +382,8 @@ class Time
 
     public function subtractYear(int $amount)
     {
-        $this->updateTime();
-        $this->year -= $amount;
+        $this->unix -= $amount * $this->durationInUnix["year"];
+        $this->updateUnix();
     }
 
 
@@ -170,7 +395,6 @@ class Time
 
     public function getMonth()
     {
-        $this->updateTime();
         return $this->month;
     }
 
@@ -179,12 +403,19 @@ class Time
      * 
      * @param int $data The new data
      * @return void
+     * 
+     * @throws TimeInvalidNegativeMonthException if trying to set to a negative value
      */
 
     public function setMonth(int $data)
     {
-        $this->updateTime();
+
+        if($data < 0) {
+            throw new TimeInvalidNegativeMonthException("error cannot set the month to be a negative value ({$data})");
+        }
+
         $this->month = $data;
+        $this->updateTime();
     }
 
     /**
@@ -196,8 +427,8 @@ class Time
 
     public function addMonth(int $amount)
     {
-        $this->updateTime();
-        $this->month += $amount;
+        $this->unix += $amount * $this->durationInUnix["month"];
+        $this->updateUnix();
     }
 
     /**
@@ -209,60 +440,8 @@ class Time
 
     public function subtractMonth(int $amount)
     {
-        $this->updateTime();
-        $this->month -= $amount;
-    }
-
-
-    /**
-     * This method will return the stored week data
-     * 
-     * @return int
-     */
-
-    public function getWeek()
-    {
-        $this->updateTime();
-        return $this->week;
-    }
-
-    /**
-     * This method will set the stored week data to the specified data
-     * 
-     * @param int $data The new data
-     * @return void
-     */
-
-    public function setWeek(int $data)
-    {
-        $this->updateTime();
-        $this->week = $data;
-    }
-
-    /**
-     * add the week
-     * 
-     * @param int $amount The amount to add
-     * @return void
-     */
-
-    public function addWeek(int $amount)
-    {
-        $this->updateTime();
-        $this->week += $amount;
-    }
-
-    /**
-     * $subtract the week
-     * 
-     * @param int $amount The amount to subtract
-     * @return void
-     */
-
-    public function subtractWeek(int $amount)
-    {
-        $this->updateTime();
-        $this->week -= $amount;
+        $this->unix -= $amount * $this->durationInUnix["month"];
+        $this->updateUnix();
     }
 
 
@@ -274,7 +453,6 @@ class Time
 
     public function getDay()
     {
-        $this->updateTime();
         return $this->day;
     }
 
@@ -283,12 +461,19 @@ class Time
      * 
      * @param int $data The new data
      * @return void
+     * 
+     * @throws TimeInvalidNegativeDayException if trying to set to a negative value
      */
 
     public function setDay(int $data)
     {
-        $this->updateTime();
+
+        if($data < 0) {
+            throw new TimeInvalidNegativeDayException("error cannot set the day to be a negative value ({$data})");
+        }
+
         $this->day = $data;
+        $this->updateTime();
     }
 
     /**
@@ -300,8 +485,8 @@ class Time
 
     public function addDay(int $amount)
     {
-        $this->updateTime();
-        $this->day += $amount;
+        $this->unix += $amount * $this->durationInUnix["day"];
+        $this->updateUnix();
     }
 
     /**
@@ -313,8 +498,8 @@ class Time
 
     public function subtractDay(int $amount)
     {
-        $this->updateTime();
-        $this->day -= $amount;
+        $this->unix -= $amount * $this->durationInUnix["day"];
+        $this->updateUnix();
     }
 
 
@@ -326,7 +511,6 @@ class Time
 
     public function getHour()
     {
-        $this->updateTime();
         return $this->hour;
     }
 
@@ -335,12 +519,19 @@ class Time
      * 
      * @param int $data The new data
      * @return void
+     * 
+     * @throws TimeInvalidNegativeHourException if trying to set to a negative value
      */
 
     public function setHour(int $data)
     {
-        $this->updateTime();
+
+        if($data < 0) {
+            throw new TimeInvalidNegativeHourException("error cannot set the hour to be a negative value ({$data})");
+        }
+
         $this->hour = $data;
+        $this->updateTime();
     }
 
     /**
@@ -352,8 +543,8 @@ class Time
 
     public function addHour(int $amount)
     {
-        $this->updateTime();
-        $this->hour += $amount;
+        $this->unix += $amount * $this->durationInUnix["hour"];
+        $this->updateUnix();
     }
 
     /**
@@ -365,8 +556,8 @@ class Time
 
     public function subtractHour(int $amount)
     {
-        $this->updateTime();
-        $this->hour -= $amount;
+        $this->unix -= $amount * $this->durationInUnix["hour"];
+        $this->updateUnix();
     }
 
 
@@ -378,7 +569,6 @@ class Time
 
     public function getMinute()
     {
-        $this->updateTime();
         return $this->minute;
     }
 
@@ -387,12 +577,19 @@ class Time
      * 
      * @param int $data The new data
      * @return void
+     * 
+     * @throws TimeInvalidNegativeMinuteException if trying to set to a negative value
      */
 
     public function setMinute(int $data)
     {
-        $this->updateTime();
+
+        if($data < 0) {
+            throw new TimeInvalidNegativeMinuteException("error cannot set the minute to be a negative value ({$data})");
+        }
+
         $this->minute = $data;
+        $this->updateTime();
     }
 
     /**
@@ -404,8 +601,8 @@ class Time
 
     public function addMinute(int $amount)
     {
-        $this->updateTime();
-        $this->minute += $amount;
+        $this->unix += $amount * $this->durationInUnix["minute"];
+        $this->updateUnix();
     }
 
     /**
@@ -417,8 +614,8 @@ class Time
 
     public function subtractMinute(int $amount)
     {
-        $this->updateTime();
-        $this->minute -= $amount;
+        $this->unix -= $amount * $this->durationInUnix["minute"];
+        $this->updateUnix();
     }
 
 
@@ -430,7 +627,6 @@ class Time
 
     public function getSecond()
     {
-        $this->updateTime();
         return $this->second;
     }
 
@@ -439,12 +635,19 @@ class Time
      * 
      * @param int $data The new data
      * @return void
+     * 
+     * @throws TimeInvalidNegativeSecondException if trying to set to a negative value
      */
 
     public function setSecond(int $data)
     {
-        $this->updateTime();
+
+        if($data < 0) {
+            throw new TimeInvalidNegativeSecondException("error cannot set the second to be a negative value ({$data})");
+        }
+
         $this->second = $data;
+        $this->updateTime();
     }
 
     /**
@@ -456,8 +659,8 @@ class Time
 
     public function addSecond(int $amount)
     {
-        $this->updateTime();
-        $this->second += $amount;
+        $this->unix += $amount;
+        $this->updateUnix();
     }
 
     /**
@@ -469,8 +672,8 @@ class Time
 
     public function subtractSecond(int $amount)
     {
-        $this->updateTime();
-        $this->second -= $amount;
+        $this->unix -= $amount;
+        $this->updateUnix();
     }
 
 }
