@@ -1,0 +1,7 @@
+<phpunit bootstrap="vendor/autoload.php" colors="true" processIsolation="false" testdox="true">
+    <testsuites>
+        <testsuite name="datetime">
+            <file>tests/TimeTest.php</file>
+        </testsuite>
+    </testsuites>
+</phpunit>

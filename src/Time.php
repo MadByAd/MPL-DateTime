@@ -19,6 +19,11 @@ use MadByAd\MPLDateTime\Exceptions\TimeInvalidNegativeDayException;
 use MadByAd\MPLDateTime\Exceptions\TimeInvalidNegativeHourException;
 use MadByAd\MPLDateTime\Exceptions\TimeInvalidNegativeMinuteException;
 use MadByAd\MPLDateTime\Exceptions\TimeInvalidNegativeSecondException;
+use MadByAd\MPLDateTime\Exceptions\TimeValueExceedMonthException;
+use MadByAd\MPLDateTime\Exceptions\TimeValueExceedDayException;
+use MadByAd\MPLDateTime\Exceptions\TimeValueExceedHourException;
+use MadByAd\MPLDateTime\Exceptions\TimeValueExceedMinuteException;
+use MadByAd\MPLDateTime\Exceptions\TimeValueExceedSecondException;
 
 /**
  * 
@@ -33,6 +38,46 @@ use MadByAd\MPLDateTime\Exceptions\TimeInvalidNegativeSecondException;
 
 class Time
 {
+
+    /**
+     * The maximum month amount
+     * 
+     * @var int
+     */
+
+    private const MONTH_LIMIT = 12;
+
+    /**
+     * The maximum day amount
+     * 
+     * @var int
+     */
+
+    private const DAY_LIMIT = 30;
+
+    /**
+     * The maximum hour amount
+     * 
+     * @var int
+     */
+
+    private const HOUR_LIMIT = 24;
+
+    /**
+     * The maximum minute amount
+     * 
+     * @var int
+     */
+
+    private const MINUTE_LIMIT = 60;
+
+    /**
+     * The maximum second amount
+     * 
+     * @var int
+     */
+
+    private const SECOND_LIMIT = 60;
 
     /**
      * Store the list of durations
@@ -114,14 +159,15 @@ class Time
     private function updateUnix()
     {
 
+        $this->year = 0;
+        $this->month = 0;
+        $this->day = 0;
+        $this->hour = 0;
+        $this->minute = 0;
+        $this->second = 0;
+
         if($this->unix <= 0) {
             $this->unix = 0;
-            $this->year = 0;
-            $this->month = 0;
-            $this->day = 0;
-            $this->hour = 0;
-            $this->minute = 0;
-            $this->second = 0;
             return;
         }
 
@@ -150,30 +196,11 @@ class Time
 
     private function updateTime()
     {
-        
-        while($this->second >= 60) {
-            $this->second -= 60;
-            $this->minute += 1;
-        }
 
-        while($this->minute >= 60) {
-            $this->minute -= 60;
-            $this->hour += 1;
-        }
+        $this->unix = 0;
 
-        while($this->hour >= 24) {
-            $this->hour -= 24;
-            $this->day += 1;
-        }
-
-        while($this->day >= 30) {
-            $this->day -= 30;
-            $this->month += 1;
-        }
-
-        while($this->month >= 12) {
-            $this->month -= 12;
-            $this->year += 1;
+        foreach($this->durationInUnix as $duration => $value) {
+            $this->unix += $this->{$duration} * $value;
         }
 
     }
@@ -405,6 +432,7 @@ class Time
      * @return void
      * 
      * @throws TimeInvalidNegativeMonthException if trying to set to a negative value
+     * @throws TimeValueExceedMonthException if trying to set a value exceeding the month range
      */
 
     public function setMonth(int $data)
@@ -412,6 +440,10 @@ class Time
 
         if($data < 0) {
             throw new TimeInvalidNegativeMonthException("error cannot set the month to be a negative value ({$data})");
+        }
+
+        if($data > self::MONTH_LIMIT) {
+            throw new TimeValueExceedMonthException("error cannot set the to be higher than 12 ({$data})");
         }
 
         $this->month = $data;
@@ -463,6 +495,7 @@ class Time
      * @return void
      * 
      * @throws TimeInvalidNegativeDayException if trying to set to a negative value
+     * @throws TimeValueExceedDayException if trying to set a value exceeding the day range
      */
 
     public function setDay(int $data)
@@ -470,6 +503,10 @@ class Time
 
         if($data < 0) {
             throw new TimeInvalidNegativeDayException("error cannot set the day to be a negative value ({$data})");
+        }
+
+        if($data > self::DAY_LIMIT) {
+            throw new TimeValueExceedDayException("error cannot set the to be higher than 30 ({$data})");
         }
 
         $this->day = $data;
@@ -521,6 +558,7 @@ class Time
      * @return void
      * 
      * @throws TimeInvalidNegativeHourException if trying to set to a negative value
+     * @throws TimeValueExceedHourException if trying to set a value exceeding the hour range
      */
 
     public function setHour(int $data)
@@ -528,6 +566,10 @@ class Time
 
         if($data < 0) {
             throw new TimeInvalidNegativeHourException("error cannot set the hour to be a negative value ({$data})");
+        }
+
+        if($data > self::HOUR_LIMIT) {
+            throw new TimeValueExceedHourException("error cannot set the to be higher than 24 ({$data})");
         }
 
         $this->hour = $data;
@@ -579,6 +621,7 @@ class Time
      * @return void
      * 
      * @throws TimeInvalidNegativeMinuteException if trying to set to a negative value
+     * @throws TimeValueExceedMinuteException if trying to set a value exceeding the minute range
      */
 
     public function setMinute(int $data)
@@ -586,6 +629,10 @@ class Time
 
         if($data < 0) {
             throw new TimeInvalidNegativeMinuteException("error cannot set the minute to be a negative value ({$data})");
+        }
+
+        if($data > self::MINUTE_LIMIT) {
+            throw new TimeValueExceedMinuteException("error cannot set the to be higher than 60 ({$data})");
         }
 
         $this->minute = $data;
@@ -637,6 +684,7 @@ class Time
      * @return void
      * 
      * @throws TimeInvalidNegativeSecondException if trying to set to a negative value
+     * @throws TimeValueExceedSecondException if trying to set a value exceeding the second range
      */
 
     public function setSecond(int $data)
@@ -644,6 +692,10 @@ class Time
 
         if($data < 0) {
             throw new TimeInvalidNegativeSecondException("error cannot set the second to be a negative value ({$data})");
+        }
+
+        if($data > self::SECOND_LIMIT) {
+            throw new TimeValueExceedSecondException("error cannot set the to be higher than 60 ({$data})");
         }
 
         $this->second = $data;
