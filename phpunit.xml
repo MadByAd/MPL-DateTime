@@ -2,6 +2,8 @@
     <testsuites>
         <testsuite name="datetime">
             <file>tests/TimeTest.php</file>
+            <file>tests/DateTest.php</file>
+            <file>tests/DateCalculatorTest.php</file>
         </testsuite>
     </testsuites>
 </phpunit>
