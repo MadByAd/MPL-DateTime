@@ -139,7 +139,7 @@ class Date
     public function __construct(int $time = null, bool $fromToday = false)
     {
 
-        if($time == null) {
+        if($time === null) {
             $time = time();
         }
 
@@ -158,6 +158,7 @@ class Date
         $this->hour = date("H", $time);
         $this->minute = date("i", $time);
         $this->second = date("s", $time);
+        $this->unix = $time;
 
     }
 
@@ -222,7 +223,7 @@ class Date
         $date = implode($dateSeparator, $date);
         $time = implode(":", $time);
 
-        return implode(" ", [$date, $time]);
+        return rtrim(implode(" ", [$date, $time]), " ");
 
     }
 
@@ -248,6 +249,17 @@ class Date
             "second" => $this->second,
             "unix" => $this->unix,
         ];
+    }
+
+    /**
+     * Return the date as a unix timestamp
+     * 
+     * @return int The unix timestamp
+     */
+
+    public function getUnix()
+    {
+        return $this->unix;
     }
 
 }

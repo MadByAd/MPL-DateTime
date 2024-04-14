@@ -151,6 +151,17 @@ class Time
     private int $second = 0;
 
     /**
+     * Construct the time class
+     * 
+     * @param int $time The time stored (in unix timestamp)
+     */
+
+    public function __construct(int $time = 0)
+    {
+        if($time != 0) $this->setUnix($time);
+    }
+
+    /**
      * Update the unix so other time duration get updated
      * 
      * @return void
@@ -299,7 +310,7 @@ class Time
 
 
     /**
-     * This method will return the stored unix data
+     * This method will return the stored unix timestamp data
      * 
      * @return int
      */
@@ -310,7 +321,7 @@ class Time
     }
 
     /**
-     * This method will set the storedunix data to the specified data
+     * This method will set the stored unix timestamp data to the specified data
      * 
      * @param int $data The new data
      * @return void
@@ -330,7 +341,7 @@ class Time
     }
 
     /**
-     * add theunix
+     * add the unix timestamp
      * 
      * @param int $amount The amount to add
      * @return void
@@ -343,7 +354,7 @@ class Time
     }
 
     /**
-     * subtract theunix
+     * subtract the unix timestamp
      * 
      * @param int $amount The amount to subtract
      * @return void
