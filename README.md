@@ -264,25 +264,25 @@ To get a time you can use these method
 
 ```php
 // get the unix timestamp
-$time->getUnix(86400);
+$time->getUnix();
 
 // get the time year
-$time->getYear(1);
+$time->getYear();
 
 // get the time month
-$time->getMonth(1);
+$time->getMonth();
 
 // get the time day
-$time->getDay(1);
+$time->getDay();
 
 // get the time hour
-$time->getHour(1);
+$time->getHour();
 
 // get the time minute
-$time->getMinute(1);
+$time->getMinute();
 
 // get the time second
-$time->getSecond(1);
+$time->getSecond();
 ```
 
 To get the time as a form of associative array you can use the `get()` method
