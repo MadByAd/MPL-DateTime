@@ -163,6 +163,41 @@ class Date
     }
 
     /**
+     * Construct a new date from int
+     * 
+     * @param int $day    The day
+     * @param int $month  The month
+     * @param int $year   The year
+     * @param int $hour   The hour
+     * @param int $minute The minute
+     * @param int $second The second
+     * 
+     * @return Date The created date
+     */
+
+    public static function createFromInt(int $day = 1, int $month = 1, int $year = 1970, int $hour = 0, int $minute = 0, int $second = 0)
+    {
+        return new Date(strtotime("$day-$month-$year $hour:$minute:$second"));
+    }
+
+    /**
+     * Construct a new date from string
+     * 
+     * @param string $date The date
+     * 
+     * @return Date The created date
+     */
+
+    public static function createFromString(string $date)
+    {
+        
+        $date = str_replace(["\\", "/"], "-", $date);
+
+        return new Date(strtotime($date));
+
+    }
+
+    /**
      * Get the date as a formatted string
      * 
      * @param string $format The format type
@@ -180,7 +215,7 @@ class Date
         $date = [];
         $time = [];
 
-        foreach($formatSeparated as $index => $format) {
+        foreach($formatSeparated as $format) {
             switch($format) {
                 case "D":
                     $date[] = $this->day;

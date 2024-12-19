@@ -1,12 +1,14 @@
 
 # MPL DateTime
 
-The MPL (MadByAd PHP Library) DateTime is a library used for advance date and time system. This library include, easily format and get the current date or/and time, a calculator for calculating time such as what the date is 20 days later or what the date is 20 days previously
+The MPL (MadByAd PHP Library) DateTime is a library that is created as simple and easy to use date and time system. This library include, easily format and get the current date or/and time, a calculator for calculating time such as what the date is 20 days later or what the date is 20 days previously
 
 - [MPL DateTime](#mpl-datetime)
   - [Installation](#installation)
   - [Include](#include)
   - [Date class](#date-class)
+    - [CreateFromInt Method](#createfromint-method)
+    - [CreateFromString Method](#createfromstring-method)
     - [Get Method](#get-method)
     - [GetArray Method](#getarray-method)
     - [GetUnix Method](#getunix-method)
@@ -58,6 +60,33 @@ new Date(86400, true);
 
 // This class will store the date yesterday
 new Date(-86400, true); 
+```
+
+### CreateFromInt Method
+
+The `Date::createFromInt(int $day = 0, int $month = 0, int $year = 0, int $hour = 0, int $minute = 0, int $second = 0)` method is used for creating a date from the given time in integer representation, it takes 6 optional parameter. The first is the day `1-31`, then the month `1-12`, then the year, then the hour, minutes and second. This method will return a new `Date` class with the given time converted into a date
+
+```php
+// this will create the date of 16 January 2009
+$date = Date::createFromInt(16, 1, 2009);
+```
+
+### CreateFromString Method
+
+The `Date::createFromString(string $date)` method is used fro creating a date from the given string of date. This method only takes 1 parameter and that is the date. This method will return a new `Date` class with the given date
+
+```php
+// this will create the date of 16 January 2009
+$date = Date::createFromString("16 January 2009");
+
+// this will also create the date of 16 January 2009
+$date = Date::createFromString("16-1-2009");
+
+// this will also create the date of 16 January 2009
+$date = Date::createFromString("16\1\2009");
+
+// this will also create the date of 16 January 2009
+$date = Date::createFromString("16/1/2009");
 ```
 
 ### Get Method
